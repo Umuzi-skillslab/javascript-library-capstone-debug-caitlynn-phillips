@@ -107,33 +107,39 @@ class PremiumMember extends Member {
 
 // Complex function with nested loops and errors
 function findOverdueBooks(daysOverdue) {
-    var overdue = [];
-    
-    // Inefficient nested loops - should be optimized
-    for (var i = 0; i < books.length; i++) {
-        for (var j = 0; j < books[i].checkedOut.length; j++) {
-            // Missing: actual date checking logic
-            // Wrong variable scoping
-            var checkoutRecord = books[i].checkedOut[j];
-            overdue.push(checkoutRecord);
+    // Validate input
+    if (typeof daysOverdue !== "number" || daysOverdue < 0) {
+        return [];
+    }
+
+    const overdue = [];
+    const now = new Date();
+
+    for (const book of books) {
+        for (const record of book.checkedOut) {
+            if (typeof record === "object" && record !== null) {
+                const checkoutDate = new Date(record.checkoutDate);
+                const diffTime = Math.abs(now - checkoutDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+                if (diffDays > daysOverdue) {
+                    overdue.push(record);
+                }
+            }
         }
     }
-    
+
     return overdue;
 }
 
 // Function with while loop error
 function processReturnQueue(queue) {
-    var index = 0;
-    
-    // Infinite loop potential
-    while (index < queue.length) {
-        var item = queue[index];
-        
-        // Process item
-        console.log("Processing return: " + item);
-        
-        // Missing: index increment
+    if (!Array.isArray(queue) || queue.length === 0) {
+        return;
+    }
+
+    for (const item of queue) {
+        console.log(`Processing return: ${item}`);
     }
 }
 
