@@ -351,27 +351,35 @@ const LibraryStats = {
 
 // Function with string manipulation errors
 function formatBookInfo(book) {
-    // Should use template literals
-    var info = "Title: " + book.title + "\n";
-    info = info + "Author: " + book.author + "\n";
-    info = info + "Year: " + book.year;
-    
-    // Missing: proper string methods (trim, toUpperCase, etc.)
-    
-    return info;
+    if (typeof book !== "object" || book === null) {
+        return "";
+    }
+
+    return `Title: ${book.title.trim()}\nAuthor: ${book.author.trim().toUpperCase()}\nYear: ${book.year}\nAvailable: ${book.availableCopies}/${book.totalCopies}`;
 }
 
-// Function with number/type issues
 function calculateFineAmount(daysLate) {
-    // Missing: typeof check
-    // Missing: NaN handling
-    // Missing: null/undefined check
-    
-    var fine = daysLate * LATE_FEE_PER_DAY;
-    
-    // Should use toFixed for currency
-    return fine;
+    if (typeof daysLate !== "number" || isNaN(daysLate) || daysLate < 0) {
+        return 0;
+    }
+
+    const fine = daysLate * LATE_FEE_PER_DAY;
+    return parseFloat(fine.toFixed(2));
 }
 
 // Missing: module exports
-// Missing: proper data structure for ISBN lookups (Map/Set)
+// ISBN lookup map for O(1) performance
+const isbnLookup = new Map();
+
+function registerBookISBN(book) {
+    if (book instanceof Book) {
+        isbnLookup.set(book.isbn, book);
+    }
+}
+
+function findBookByISBNFast(isbn) {
+    if (typeof isbn !== "string" || isbn === "") {
+        return null;
+    }
+    return isbnLookup.get(isbn) || null;
+}
