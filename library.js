@@ -199,33 +199,42 @@ function combineBookCollections(fiction, nonFiction, reference) {
 }
 
 // Function missing rest parameters
-function addMultipleBooks(book1, book2, book3) {
-    // Should use rest parameters to accept unlimited books
-    books.push(book1);
-    books.push(book2);
-    books.push(book3);
+function addMultipleBooks(...newBooks) {
+    if (newBooks.length === 0) {
+        return;
+    }
+
+    for (const book of newBooks) {
+        if (book instanceof Book) {
+            books.push(book);
+        }
+    }
 }
 
 // Function missing destructuring
 function updateMemberInfo(member, updates) {
-    // Should destructure updates object
-    member.name = updates.name;
-    member.email = updates.email;
-    member.membershipType = updates.membershipType;
-    
+    if (typeof member !== "object" || member === null) {
+        return null;
+    }
+
+    if (typeof updates !== "object" || updates === null) {
+        return member;
+    }
+
+    const { name, email, membershipType } = updates;
+
+    if (name !== undefined) member.name = name;
+    if (email !== undefined) member.email = email;
+    if (membershipType !== undefined) member.membershipType = membershipType;
+
     return member;
 }
 
 // Function with no error handling
 function borrowBook(memberId, isbn) {
-    // Missing: try-catch block
-    // Missing: validation for undefined/null
-    // Missing: typeof checks
-    
     var member = findMemberById(memberId);
     var book = findBookByISBN(isbn);
     
-    // No check if member or book exists
     if (member.canBorrow()) {
         book.checkOut(memberId);
         member.borrowedBooks.push(isbn);
@@ -235,59 +244,108 @@ function borrowBook(memberId, isbn) {
     return false;
 }
 
+function borrowBook(memberId, isbn) {
+    if (typeof memberId === "undefined" || memberId === null) {
+        return false;
+    }
+
+    if (typeof isbn === "undefined" || isbn === null) {
+        return false;
+    }
+
+    try {
+        const member = findMemberById(memberId);
+        const book = findBookByISBN(isbn);
+
+        if (member === null || member === undefined) {
+            throw new Error(`Member with ID ${memberId} not found`);
+        }
+
+        if (book === null || book === undefined) {
+            throw new Error(`Book with ISBN ${isbn} not found`);
+        }
+
+        if (member.canBorrow() && book.isAvailable()) {
+            book.checkOut(memberId);
+            member.borrowedBooks.push(isbn);
+            return true;
+        }
+
+        return false;
+    } catch (error) {
+        console.error(`borrowBook error: ${error.message}`);
+        return false;
+    }
+}
+
+
 // Helper functions with errors
 function findMemberById(id) {
-    // Should use find method
-    for (var i = 0; i < members.length; i++) {
-        if (members[i].id = id) {  // Wrong operator
-            return members[i];
-        }
+    if (typeof id === "undefined" || id === null) {
+        return null;
     }
-    // Returns undefined implicitly - should handle explicitly
+
+    return members.find(function(member) {
+        return member.id === id;
+    });
 }
 
 function findBookByISBN(isbn) {
-    var i = 0;
-    
-    // Wrong loop choice
-    while (i < books.length) {
-        if (books[i].isbn === isbn) {
-            return books[i];
-        }
-        i = i + 1;
+    if (typeof isbn === "undefined" || isbn === null) {
+        return null;
     }
-    
-    return null;
+
+    return books.find(function(book) {
+        return book.isbn === isbn;
+    });
 }
 
 // Statistics object with missing methods
-var LibraryStats = {
+const LibraryStats = {
     totalBooks: 0,
     totalMembers: 0,
     totalBorrowings: 0,
-    
-    // Missing: method using Math object for calculations
-    // Missing: method using for-of loop
-    // Missing: method returning object with destructuring
-    
+
     updateStats: function() {
         this.totalBooks = books.length;
         this.totalMembers = members.length;
     },
-    
-    getMostPopularBook: function() {
-        // Inefficient implementation - should use reduce
-        var maxCheckouts = 0;
-        var popularBook = null;
-        
-        for (var i = 0; i < books.length; i++) {
-            if (books[i].checkedOut.length > maxCheckouts) {
-                maxCheckouts = books[i].checkedOut.length;
-                popularBook = books[i];
+
+    // Method using Math object for calculations
+    getAverageCheckouts: function() {
+        if (books.length === 0) {
+            return 0;
+        }
+        const total = books.reduce(function(sum, book) {
+            return sum + book.checkedOut.length;
+        }, 0);
+        return Math.round(total / books.length);
+    },
+
+    // Method using for-of loop
+    getBorrowingSummary: function() {
+        const summary = [];
+        for (const book of books) {
+            if (book.checkedOut.length > 0) {
+                summary.push(`${book.title}: ${book.checkedOut.length} checkouts`);
             }
         }
-        
-        return popularBook;
+        return summary;
+    },
+
+    // Method returning object with destructuring
+    getStats: function() {
+        const { totalBooks, totalMembers, totalBorrowings } = this;
+        return { totalBooks, totalMembers, totalBorrowings };
+    },
+
+    getMostPopularBook: function() {
+        if (books.length === 0) {
+            return null;
+        }
+        return books.reduce(function(mostPopular, book) {
+            return book.checkedOut.length > mostPopular.checkedOut.length ? book : mostPopular;
+        }, books[0]);
     }
 };
 
