@@ -89,10 +89,20 @@ class Member {
 class PremiumMember extends Member {
     constructor(id, name, email) {
         super(id, name, email, "premium");
-        // Missing: additional premium benefits properties
+        this.premiumBenefits = ["priority reservations", "extended loans", "digital access"];
+        this.maxBooks = 10;
     }
-    
-    // Should override canBorrow to allow more books
+
+  canBorrow() {
+        if (this.borrowedBooks.length === this.maxBooks) {
+            return false;
+        }
+        return true;
+    }
+
+    getBenefits() {
+        return `Premium benefits: ${this.premiumBenefits.join(", ")}`;
+    }
 }
 
 // Complex function with nested loops and errors
