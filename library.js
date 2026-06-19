@@ -144,54 +144,58 @@ function processReturnQueue(queue) {
 }
 
 // Recursive function with multiple errors
-function searchBooksByCategory(bookList, category, index) {
-    // Missing: base case
-    // Missing: undefined/null checks
-    // Wrong comparison
-    
-    if (bookList[index].category = category) {
-        return [bookList[index]].concat(searchBooksByCategory(bookList, category, index + 1));
+function searchBooksByCategory(bookList, category, index = 0) {
+    // Null/undefined checks
+    if (!Array.isArray(bookList) || typeof category !== "string") {
+        return [];
     }
-    
+
+    // Base case - stops recursion
+    if (index >= bookList.length) {
+        return [];
+    }
+
+    const currentBook = bookList[index];
+
+    if (currentBook.category === category) {
+        return [currentBook].concat(searchBooksByCategory(bookList, category, index + 1));
+    }
+
     return searchBooksByCategory(bookList, category, index + 1);
 }
-
 // Function missing array methods
 function getBooksByAuthor(authorName) {
-    var result = [];
-    
-    // Should use filter method
-    for (var i = 0; i < books.length; i++) {
-        if (books[i].author == authorName) {  // Should use ===
-            result.push(books[i]);
-        }
+    if (typeof authorName !== "string" || authorName.trim() === "") {
+        return [];
     }
-    
-    return result;
+
+    return books.filter(function(book) {
+        return book.author === authorName;
+    });
 }
 
 // Function that should use reduce
 function calculateTotalLateFees(memberRecord) {
-    var total = 0;
-    
-    // Should use reduce on array
-    for (var i = 0; i < memberRecord.overdueBooks.length; i++) {
-        total = total + memberRecord.overdueBooks[i].daysLate * LATE_FEE_PER_DAY;
+    if (typeof memberRecord !== "object" || memberRecord === null) {
+        return 0;
     }
-    
-    return total;
+
+    if (!Array.isArray(memberRecord.overdueBooks) || memberRecord.overdueBooks.length === 0) {
+        return 0;
+    }
+
+    return memberRecord.overdueBooks.reduce(function(total, book) {
+        return total + book.daysLate * LATE_FEE_PER_DAY;
+    }, 0);
 }
 
 // Function missing spread operator
 function combineBookCollections(fiction, nonFiction, reference) {
-    // Should use spread operator
-    var combined = [];
-    
-    for (var i = 0; i < fiction.length; i++) combined.push(fiction[i]);
-    for (var i = 0; i < nonFiction.length; i++) combined.push(nonFiction[i]);
-    for (var i = 0; i < reference.length; i++) combined.push(reference[i]);
-    
-    return combined;
+    if (!Array.isArray(fiction) || !Array.isArray(nonFiction) || !Array.isArray(reference)) {
+        return [];
+    }
+
+    return [...fiction, ...nonFiction, ...reference];
 }
 
 // Function missing rest parameters
