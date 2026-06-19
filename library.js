@@ -1,10 +1,10 @@
 // Library Management System - Starter Code with Complex Errors
 
 // Global state management (scoping issues)
-books = [];  // Missing declaration
-var members = [];  // Wrong: should use let
+let books = [];
+let members = [];
 const LATE_FEE_PER_DAY = 0.50;
-MAX_BOOKS_PER_MEMBER = 5;  // Missing const
+const MAX_BOOKS_PER_MEMBER = 5;
 
 // Book class with multiple issues
 class Book {
@@ -13,16 +13,24 @@ class Book {
         this.title = title;
         this.author = author;
         this.year = year;
-        // Missing: availableCopies and totalCopies properties
+        this.totalCopies = copies;
+        this.availableCopies = copies;
         this.checkedOut = [];
     }
     
-    // Missing: method to check availability
-    // Missing: method to get book info using template literals
-    
-    checkOut(memberId) {
-        // No validation for available copies
+     isAvailable() {
+        return this.availableCopies > 0;
+    }
+    getInfo() {
+        return `Title: ${this.title}, Author: ${this.author}, Year: ${this.year}, Available: ${this.availableCopies}/${this.totalCopies}`;
+    }
+
+        checkOut(memberId) {
+        if (this.availableCopies <= 0) {
+            return false;
+        }
         this.checkedOut.push(memberId);
+        this.availableCopies--;
         return true;
     }
 }
