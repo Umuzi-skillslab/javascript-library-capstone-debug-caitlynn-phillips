@@ -38,15 +38,19 @@ class Book {
 // Digital book class with inheritance problems
 class DigitalBook extends Book {
     constructor(isbn, title, author, year, fileSize, format) {
-        // Missing: super() call with correct parameters
+        super(isbn, title, author, year, 0);
         this.fileSize = fileSize;
         this.format = format;
         this.downloads = 0;
     }
     
     download(memberId) {
-        // Should override differently than physical checkout
-        this.downloads = this.downloads + 1;
+        this.downloads++;
+        return `${memberId} downloaded ${this.title} (${this.format}, ${this.fileSize}MB)`;
+    }
+
+    getInfo() {
+        return `${super.getInfo()}, Format: ${this.format}, File Size: ${this.fileSize}MB`;
     }
 }
 
