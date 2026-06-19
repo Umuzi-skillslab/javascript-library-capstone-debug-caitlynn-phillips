@@ -62,15 +62,23 @@ class Member {
         this.email = email;
         this.membershipType = membershipType;
         this.borrowedBooks = [];
-        // Missing: joinDate property
+        this.joinDate = new Date();
     }
     
-    // Missing: method to calculate membership duration
-    // Missing: method using destructuring
+    getMembershipDuration() {
+        const now = new Date();
+        const diffTime = Math.abs(now - this.joinDate);
+        const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+        return diffDays;
+    }
+
+     getMemberInfo() {
+        const { name, email, membershipType, joinDate } = this;
+        return `Name: ${name}, Email: ${email}, Type: ${membershipType}, Joined: ${joinDate.toDateString()}`;
+    }
     
     canBorrow() {
-        // Wrong comparison operator
-        if (this.borrowedBooks.length = MAX_BOOKS_PER_MEMBER) {
+        if (this.borrowedBooks.length === MAX_BOOKS_PER_MEMBER) {
             return false;
         }
         return true;
