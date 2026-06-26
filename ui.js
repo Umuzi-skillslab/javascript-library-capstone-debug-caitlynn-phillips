@@ -102,47 +102,46 @@ function handleBorrowSubmit(event) {
     }
 }
 
-// Function missing event delegation
 function handleBookClick(event) {
-    // Should use event.target properly
-    // Missing: closest() for event delegation
+    const bookCard = event.target.closest(".book-card");
     
-    var bookElement = event.target;
-    var bookId = bookElement.id;
-    
-    displayBookDetails(bookId);
+    if (!bookCard) {
+        return;
+    }
+
+    const isbn = bookCard.dataset.isbn;
+
+    if (!isbn) {
+        console.error("No ISBN found on book card");
+        return;
+    }
+
+    displayBookDetails(isbn);
 }
 
-// Search function with errors
 function handleSearch(event) {
-    var searchTerm = event.target.value;
-    
-    // Case-sensitive search - should use toLowerCase()
-    // Inefficient filtering
-    var results = [];
-    for (var i = 0; i < books.length; i++) {
-        if (books[i].title.includes(searchTerm)) {
-            results.push(books[i]);
-        }
-    }
-    
+    const searchTerm = event.target.value.trim().toLowerCase();
+
+    const results = books.filter(function(book) {
+        return book.title.toLowerCase().includes(searchTerm) ||
+               book.author.toLowerCase().includes(searchTerm);
+    });
+
     renderBookCatalogue(results);
 }
 
-// Function with filter errors
 function handleFilterChange() {
-    var selectedCategory = filterDropdown.value;
-    
-    // Missing: "all" option handling
-    // Should use array filter method
-    
-    var filtered = [];
-    for (var i = 0; i < books.length; i++) {
-        if (books[i].category = selectedCategory) {  // Wrong operator
-            filtered.push(books[i]);
-        }
+    const selectedCategory = filterDropdown.value;
+
+    if (selectedCategory === "all" || selectedCategory === "") {
+        renderBookCatalogue(books);
+        return;
     }
-    
+
+    const filtered = books.filter(function(book) {
+        return book.category === selectedCategory;
+    });
+
     renderBookCatalogue(filtered);
 }
 
