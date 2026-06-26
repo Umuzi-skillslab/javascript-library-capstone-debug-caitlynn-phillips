@@ -145,50 +145,58 @@ function handleFilterChange() {
     renderBookCatalogue(filtered);
 }
 
-// Function missing JSON operations
 function exportLibraryData() {
-    // Should convert to JSON
-    // Missing: error handling
-    
-    var data = {
-        books: books,
-        members: members
-    };
-    
-    // Missing: JSON.stringify
-    return data;
+    try {
+        const data = { books, members };
+        return JSON.stringify(data, null, 2);
+    } catch (error) {
+        console.error(`exportLibraryData error: ${error.message}`);
+        return null;
+    }
 }
 
-// Function missing JSON parsing
 function importLibraryData(jsonString) {
-    // Missing: try-catch for JSON.parse
-    // Missing: validation of parsed data
-    
-    var data = JSON.parse(jsonString);
-    
-    books = data.books;
-    members = data.members;
+    try {
+        if (typeof jsonString !== "string" || jsonString.trim() === "") {
+            return false;
+        }
+
+        const data = JSON.parse(jsonString);
+
+        if (!Array.isArray(data.books) || !Array.isArray(data.members)) {
+            return false;
+        }
+
+        books = data.books;
+        members = data.members;
+        return true;
+    } catch (error) {
+        console.error(`importLibraryData error: ${error.message}`);
+        return false;
+    }
 }
 
-// LocalStorage functions with errors
 function saveToLocalStorage() {
-    // Missing: error handling for localStorage
-    // Missing: JSON.stringify
-    
-    localStorage.setItem("libraryBooks", books);
-    localStorage.setItem("libraryMembers", members);
+    try {
+        localStorage.setItem("libraryBooks", JSON.stringify(books));
+        localStorage.setItem("libraryMembers", JSON.stringify(members));
+    } catch (error) {
+        console.error(`saveToLocalStorage error: ${error.message}`);
+    }
 }
 
 function loadFromLocalStorage() {
-    // Missing: null check
-    // Missing: JSON.parse
-    // Missing: error handling
-    
-    var booksData = localStorage.getItem("libraryBooks");
-    var membersData = localStorage.getItem("libraryMembers");
-    
-    books = booksData;
-    members = membersData;
+    try {
+        const booksData = localStorage.getItem("libraryBooks");
+        const membersData = localStorage.getItem("libraryMembers");
+
+        books = booksData ? JSON.parse(booksData) : [];
+        members = membersData ? JSON.parse(membersData) : [];
+    } catch (error) {
+        console.error(`loadFromLocalStorage error: ${error.message}`);
+        books = [];
+        members = [];
+    }
 }
 
 // Display function with template issues
