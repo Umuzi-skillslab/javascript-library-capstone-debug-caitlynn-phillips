@@ -1,6 +1,3 @@
-// Library UI - DOM Manipulation with Complex Errors
-
-// Missing: proper initialization with DOMContentLoaded
 let catalogueContainer;
 let searchInput;
 let filterDropdown;
@@ -22,60 +19,87 @@ function initializeUI() {
 document.addEventListener("DOMContentLoaded", initializeUI);
 
 function setupEventListeners() {
-    // Missing: search input event listener
-    
-    // Wrong event type
-    filterDropdown.addEventListener("click", handleFilterChange);
-    
-    // Missing: form submission prevention
-    var borrowForm = document.getElementById("borrow-form");
-    borrowForm.addEventListener("submit", handleBorrowSubmit);
-    
-    // Missing: event delegation for dynamic elements
+    searchInput.addEventListener("input", handleSearch);
+    filterDropdown.addEventListener("change", handleFilterChange);
+
+    const borrowForm = document.getElementById("borrow-form");
+    if (borrowForm) {
+        borrowForm.addEventListener("submit", handleBorrowSubmit);
+    }
+
+    // Event delegation handles clicks on dynamically rendered book cards
+    if (catalogueContainer) {
+        catalogueContainer.addEventListener("click", function(event) {
+            const bookCard = event.target.closest(".book-card");
+            if (bookCard) {
+                const isbn = bookCard.dataset.isbn;
+                displayBookDetails(isbn);
+            }
+        });
+    }
 }
 
-// Complex DOM rendering with errors
 function renderBookCatalogue(bookList) {
-    // Should clear container first
-    
-    // Inefficient - should use DocumentFragment or template literals
-    for (var i = 0; i < bookList.length; i++) {
-        var bookCard = document.createElement("div");
-        bookCard.className = "book-card";
-        
-        // Should use template literals and data attributes
-        bookCard.innerHTML = "<h3>" + bookList[i].title + "</h3>";
-        bookCard.innerHTML = bookCard.innerHTML + "<p>Author: " + bookList[i].author + "</p>";
-        bookCard.innerHTML = bookCard.innerHTML + "<p>Available: " + bookList[i].availableCopies + "</p>";
-        
-        // Missing: unique ID or data attribute for book
-        // Missing: event listener for book selection
-        
-        catalogueContainer.appendChild(bookCard);
+    if (!Array.isArray(bookList)) {
+        return;
     }
+
+    // Clear container before re-rendering to avoid duplicates
+    catalogueContainer.innerHTML = "";
+
+    const fragment = document.createDocumentFragment();
+
+    for (const book of bookList) {
+        const bookCard = document.createElement("div");
+        bookCard.className = "book-card";
+        bookCard.dataset.isbn = book.isbn;
+
+        bookCard.innerHTML = `
+            <h3>${book.title}</h3>
+            <p>Author: ${book.author}</p>
+            <p>Year: ${book.year}</p>
+            <p>Available: ${book.availableCopies}/${book.totalCopies}</p>
+        `;
+
+        fragment.appendChild(bookCard);
+    }
+
+    catalogueContainer.appendChild(fragment);
 }
 
-// Function with event handling errors
 function handleBorrowSubmit(event) {
-    // Missing: event.preventDefault()
-    
-    var memberIdInput = document.getElementById("member-id");
-    var isbnInput = document.getElementById("isbn");
-    
-    var memberId = memberIdInput.value;
-    var isbn = isbnInput.value;
-    
-    // Missing: input validation
-    // Missing: error handling
-    
-    var success = borrowBook(memberId, isbn);
-    
-    // Poor user feedback
-    if (success) {
-        alert("Book borrowed successfully");
+    event.preventDefault();
+
+    const memberIdInput = document.getElementById("member-id");
+    const isbnInput = document.getElementById("isbn");
+
+    if (!memberIdInput || !isbnInput) {
+        console.error("Form inputs not found");
+        return;
     }
-    
-    // Missing: form reset
+
+    const memberId = memberIdInput.value.trim();
+    const isbn = isbnInput.value.trim();
+
+    if (memberId === "" || isbn === "") {
+        alert("Please fill in all fields");
+        return;
+    }
+
+    try {
+        const success = borrowBook(memberId, isbn);
+
+        if (success) {
+            alert(`Successfully borrowed book with ISBN: ${isbn}`);
+            memberIdInput.value = "";
+            isbnInput.value = "";
+            renderBookCatalogue(books);
+        } else {
+            alert("Unable to borrow book. Please check availability and borrowing limit.");
+        }
+    } catch (error) {
+        console.error(`handleBorrowSubmit error: ${error.message}`);
+    }
 }
 
 // Function missing event delegation
