@@ -199,38 +199,52 @@ function loadFromLocalStorage() {
     }
 }
 
-// Display function with template issues
 function displayBookDetails(isbn) {
-    var book = findBookByISBN(isbn);
-    
-    // Missing: null check
-    
-    var detailsContainer = document.getElementById("book-details");
-    
-    // Should use template literals
-    var html = "<div class='book-details'>";
-    html = html + "<h2>" + book.title + "</h2>";
-    html = html + "<p><strong>Author:</strong> " + book.author + "</p>";
-    html = html + "<p><strong>ISBN:</strong> " + book.isbn + "</p>";
-    html = html + "<p><strong>Year:</strong> " + book.year + "</p>";
-    html = html + "</div>";
-    
-    detailsContainer.innerHTML = html;
+    if (typeof isbn !== "string" || isbn.trim() === "") {
+        return;
+    }
+
+    const book = findBookByISBN(isbn);
+
+    if (book === null || book === undefined) {
+        console.error(`Book with ISBN ${isbn} not found`);
+        return;
+    }
+
+    const detailsContainer = document.getElementById("book-details");
+
+    if (!detailsContainer) {
+        console.error("Book details container not found");
+        return;
+    }
+
+    detailsContainer.innerHTML = `
+        <div class="book-details">
+            <h2>${book.title}</h2>
+            <p><strong>Author:</strong> ${book.author}</p>
+            <p><strong>ISBN:</strong> ${book.isbn}</p>
+            <p><strong>Year:</strong> ${book.year}</p>
+            <p><strong>Available:</strong> ${book.availableCopies}/${book.totalCopies}</p>
+        </div>
+    `;
 }
 
-// Statistics display with errors
 function updateStatisticsDisplay() {
-    // Wrong selector methods
-    var totalBooksEl = document.querySelector(".total-books");
-    var totalMembersEl = document.querySelector(".total-members");
-    
-    // Missing: null checks
-    // Should use textContent instead of innerHTML for text
-    
-    totalBooksEl.innerHTML = books.length;
-    totalMembersEl.innerHTML = members.length;
-    
-    // Missing: update other statistics
+    const totalBooksEl = document.querySelector(".total-books");
+    const totalMembersEl = document.querySelector(".total-members");
+    const totalBorrowingsEl = document.querySelector(".total-borrowings");
+
+    if (totalBooksEl) {
+        totalBooksEl.textContent = books.length;
+    }
+
+    if (totalMembersEl) {
+        totalMembersEl.textContent = members.length;
+    }
+
+    if (totalBorrowingsEl) {
+        totalBorrowingsEl.textContent = LibraryStats.totalBorrowings;
+    }
 }
 
 // Dynamic form generation with errors
