@@ -247,29 +247,49 @@ function updateStatisticsDisplay() {
     }
 }
 
-// Dynamic form generation with errors
 function createMemberForm() {
-    var formContainer = document.getElementById("member-form");
-    
-    // Inefficient DOM manipulation
-    var form = document.createElement("form");
-    
-    var nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.id = "name";
-    // Missing: label, placeholder, required attribute
-    
-    var emailInput = document.createElement("input");
-    emailInput.type = "text";  // Should be "email"
-    emailInput.id = "email";
-    
-    // Missing: other form fields
-    
-    form.appendChild(nameInput);
-    form.appendChild(emailInput);
-    
+    const formContainer = document.getElementById("member-form");
+
+    if (!formContainer) {
+        console.error("Member form container not found");
+        return;
+    }
+
+    const form = document.createElement("form");
+    form.id = "new-member-form";
+
+    form.innerHTML = `
+        <div class="form-group">
+            <label for="member-name">Name</label>
+            <input type="text" id="member-name" placeholder="Enter full name" required>
+        </div>
+        <div class="form-group">
+            <label for="member-email">Email</label>
+            <input type="email" id="member-email" placeholder="Enter email address" required>
+        </div>
+        <div class="form-group">
+            <label for="membership-type">Membership Type</label>
+            <select id="membership-type">
+                <option value="standard">Standard</option>
+                <option value="premium">Premium</option>
+            </select>
+        </div>
+        <button type="submit">Add Member</button>
+    `;
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault();
+        const name = document.getElementById("member-name").value.trim();
+        const email = document.getElementById("member-email").value.trim();
+        const membershipType = document.getElementById("membership-type").value;
+
+        if (name && email) {
+            const newMember = new Member(members.length + 1, name, email, membershipType);
+            members.push(newMember);
+            updateStatisticsDisplay();
+            form.reset();
+        }
+    });
+
     formContainer.appendChild(form);
 }
-
-// Initialize on wrong event
-initializeUI();  // Wrong: should wait for DOMContentLoaded
