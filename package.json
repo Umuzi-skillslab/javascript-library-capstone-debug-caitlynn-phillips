@@ -11,6 +11,9 @@
   "keywords": ["library", "books", "javascript", "management"],
   "author": "",
   "license": "ISC",
+  "jest": {
+    "testEnvironment": "jsdom"
+  },
   "devDependencies": {
     "jest": "^29.0.0"
   }
