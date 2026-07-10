@@ -1,12 +1,11 @@
-// Library Management System - Starter Code with Complex Errors
+// Library Management System - Core Logic
 
-// Global state management (scoping issues)
 let books = [];
 let members = [];
+
 const LATE_FEE_PER_DAY = 0.50;
 const MAX_BOOKS_PER_MEMBER = 5;
 
-// Book class with multiple issues
 class Book {
     constructor(isbn, title, author, year, copies) {
         this.isbn = isbn;
@@ -17,15 +16,16 @@ class Book {
         this.availableCopies = copies;
         this.checkedOut = [];
     }
-    
-     isAvailable() {
+
+    isAvailable() {
         return this.availableCopies > 0;
     }
+
     getInfo() {
         return `Title: ${this.title}, Author: ${this.author}, Year: ${this.year}, Available: ${this.availableCopies}/${this.totalCopies}`;
     }
 
-        checkOut(memberId) {
+    checkOut(memberId) {
         if (this.availableCopies <= 0) {
             return false;
         }
@@ -35,15 +35,15 @@ class Book {
     }
 }
 
-// Digital book class with inheritance problems
 class DigitalBook extends Book {
     constructor(isbn, title, author, year, fileSize, format) {
+        // Digital books have no physical copies
         super(isbn, title, author, year, 0);
         this.fileSize = fileSize;
         this.format = format;
         this.downloads = 0;
     }
-    
+
     download(memberId) {
         this.downloads++;
         return `${memberId} downloaded ${this.title} (${this.format}, ${this.fileSize}MB)`;
@@ -54,7 +54,6 @@ class DigitalBook extends Book {
     }
 }
 
-// Member class with errors
 class Member {
     constructor(id, name, email, membershipType) {
         this.id = id;
@@ -64,7 +63,7 @@ class Member {
         this.borrowedBooks = [];
         this.joinDate = new Date();
     }
-    
+
     getMembershipDuration() {
         const now = new Date();
         const diffTime = Math.abs(now - this.joinDate);
@@ -72,11 +71,11 @@ class Member {
         return diffDays;
     }
 
-     getMemberInfo() {
+    getMemberInfo() {
         const { name, email, membershipType, joinDate } = this;
         return `Name: ${name}, Email: ${email}, Type: ${membershipType}, Joined: ${joinDate.toDateString()}`;
     }
-    
+
     canBorrow() {
         if (this.borrowedBooks.length === MAX_BOOKS_PER_MEMBER) {
             return false;
@@ -85,7 +84,6 @@ class Member {
     }
 }
 
-// Premium member with inheritance issues
 class PremiumMember extends Member {
     constructor(id, name, email) {
         super(id, name, email, "premium");
@@ -93,7 +91,8 @@ class PremiumMember extends Member {
         this.maxBooks = 10;
     }
 
-  canBorrow() {
+    // Premium members can borrow up to 10 books
+    canBorrow() {
         if (this.borrowedBooks.length === this.maxBooks) {
             return false;
         }
@@ -105,9 +104,7 @@ class PremiumMember extends Member {
     }
 }
 
-// Complex function with nested loops and errors
 function findOverdueBooks(daysOverdue) {
-    // Validate input
     if (typeof daysOverdue !== "number" || daysOverdue < 0) {
         return [];
     }
@@ -121,7 +118,6 @@ function findOverdueBooks(daysOverdue) {
                 const checkoutDate = new Date(record.checkoutDate);
                 const diffTime = Math.abs(now - checkoutDate);
                 const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-
                 if (diffDays > daysOverdue) {
                     overdue.push(record);
                 }
@@ -132,25 +128,21 @@ function findOverdueBooks(daysOverdue) {
     return overdue;
 }
 
-// Function with while loop error
 function processReturnQueue(queue) {
     if (!Array.isArray(queue) || queue.length === 0) {
         return;
     }
-
     for (const item of queue) {
         console.log(`Processing return: ${item}`);
     }
 }
 
-// Recursive function with multiple errors
 function searchBooksByCategory(bookList, category, index = 0) {
-    // Null/undefined checks
     if (!Array.isArray(bookList) || typeof category !== "string") {
         return [];
     }
 
-    // Base case - stops recursion
+    // Base case
     if (index >= bookList.length) {
         return [];
     }
@@ -163,47 +155,39 @@ function searchBooksByCategory(bookList, category, index = 0) {
 
     return searchBooksByCategory(bookList, category, index + 1);
 }
-// Function missing array methods
+
 function getBooksByAuthor(authorName) {
     if (typeof authorName !== "string" || authorName.trim() === "") {
         return [];
     }
-
     return books.filter(function(book) {
         return book.author === authorName;
     });
 }
 
-// Function that should use reduce
 function calculateTotalLateFees(memberRecord) {
     if (typeof memberRecord !== "object" || memberRecord === null) {
         return 0;
     }
-
     if (!Array.isArray(memberRecord.overdueBooks) || memberRecord.overdueBooks.length === 0) {
         return 0;
     }
-
     return memberRecord.overdueBooks.reduce(function(total, book) {
         return total + book.daysLate * LATE_FEE_PER_DAY;
     }, 0);
 }
 
-// Function missing spread operator
 function combineBookCollections(fiction, nonFiction, reference) {
     if (!Array.isArray(fiction) || !Array.isArray(nonFiction) || !Array.isArray(reference)) {
         return [];
     }
-
     return [...fiction, ...nonFiction, ...reference];
 }
 
-// Function missing rest parameters
 function addMultipleBooks(...newBooks) {
     if (newBooks.length === 0) {
         return;
     }
-
     for (const book of newBooks) {
         if (book instanceof Book) {
             books.push(book);
@@ -211,44 +195,24 @@ function addMultipleBooks(...newBooks) {
     }
 }
 
-// Function missing destructuring
 function updateMemberInfo(member, updates) {
     if (typeof member !== "object" || member === null) {
         return null;
     }
-
     if (typeof updates !== "object" || updates === null) {
         return member;
     }
-
     const { name, email, membershipType } = updates;
-
     if (name !== undefined) member.name = name;
     if (email !== undefined) member.email = email;
     if (membershipType !== undefined) member.membershipType = membershipType;
-
     return member;
-}
-
-// Function with no error handling
-function borrowBook(memberId, isbn) {
-    var member = findMemberById(memberId);
-    var book = findBookByISBN(isbn);
-    
-    if (member.canBorrow()) {
-        book.checkOut(memberId);
-        member.borrowedBooks.push(isbn);
-        return true;
-    }
-    
-    return false;
 }
 
 function borrowBook(memberId, isbn) {
     if (typeof memberId === "undefined" || memberId === null) {
         return false;
     }
-
     if (typeof isbn === "undefined" || isbn === null) {
         return false;
     }
@@ -260,17 +224,14 @@ function borrowBook(memberId, isbn) {
         if (member === null || member === undefined) {
             throw new Error(`Member with ID ${memberId} not found`);
         }
-
         if (book === null || book === undefined) {
             throw new Error(`Book with ISBN ${isbn} not found`);
         }
-
         if (member.canBorrow() && book.isAvailable()) {
             book.checkOut(memberId);
             member.borrowedBooks.push(isbn);
             return true;
         }
-
         return false;
     } catch (error) {
         console.error(`borrowBook error: ${error.message}`);
@@ -278,13 +239,10 @@ function borrowBook(memberId, isbn) {
     }
 }
 
-
-// Helper functions with errors
 function findMemberById(id) {
     if (typeof id === "undefined" || id === null) {
         return null;
     }
-
     return members.find(function(member) {
         return member.id === id;
     });
@@ -294,13 +252,11 @@ function findBookByISBN(isbn) {
     if (typeof isbn === "undefined" || isbn === null) {
         return null;
     }
-
     return books.find(function(book) {
         return book.isbn === isbn;
     });
 }
 
-// Statistics object with missing methods
 const LibraryStats = {
     totalBooks: 0,
     totalMembers: 0,
@@ -311,7 +267,6 @@ const LibraryStats = {
         this.totalMembers = members.length;
     },
 
-    // Method using Math object for calculations
     getAverageCheckouts: function() {
         if (books.length === 0) {
             return 0;
@@ -322,18 +277,12 @@ const LibraryStats = {
         return Math.round(total / books.length);
     },
 
-    // Method using for-of loop
     getBorrowingSummary: function() {
-        const summary = [];
-        for (const book of books) {
-            if (book.checkedOut.length > 0) {
-                summary.push(`${book.title}: ${book.checkedOut.length} checkouts`);
-            }
-        }
-        return summary;
+        return books
+            .filter(book => book.checkedOut.length > 0)
+            .map(book => `${book.title}: ${book.checkedOut.length} checkouts`);
     },
 
-    // Method returning object with destructuring
     getStats: function() {
         const { totalBooks, totalMembers, totalBorrowings } = this;
         return { totalBooks, totalMembers, totalBorrowings };
@@ -346,15 +295,17 @@ const LibraryStats = {
         return books.reduce(function(mostPopular, book) {
             return book.checkedOut.length > mostPopular.checkedOut.length ? book : mostPopular;
         }, books[0]);
+    },
+
+    hasAvailableBooks: function() {
+        return books.some(book => book.isAvailable());
     }
 };
 
-// Function with string manipulation errors
 function formatBookInfo(book) {
     if (typeof book !== "object" || book === null) {
         return "";
     }
-
     return `Title: ${book.title.trim()}\nAuthor: ${book.author.trim().toUpperCase()}\nYear: ${book.year}\nAvailable: ${book.availableCopies}/${book.totalCopies}`;
 }
 
@@ -362,13 +313,10 @@ function calculateFineAmount(daysLate) {
     if (typeof daysLate !== "number" || isNaN(daysLate) || daysLate < 0) {
         return 0;
     }
-
     const fine = daysLate * LATE_FEE_PER_DAY;
     return parseFloat(fine.toFixed(2));
 }
 
-// Missing: module exports
-// ISBN lookup map for O(1) performance
 const isbnLookup = new Map();
 
 function registerBookISBN(book) {
@@ -383,3 +331,83 @@ function findBookByISBNFast(isbn) {
     }
     return isbnLookup.get(isbn) || null;
 }
+
+function getBookTitles() {
+    return books.map(book => book.title);
+}
+
+function addBook(isbn, title, author, year, totalCopies, category) {
+    if (typeof isbn !== "string" || isbn.trim() === "") {
+        throw new Error("Invalid ISBN");
+    }
+    if (typeof title !== "string" || title.trim() === "") {
+        throw new Error("Invalid title");
+    }
+    if (typeof author !== "string" || author.trim() === "") {
+        throw new Error("Invalid author");
+    }
+    if (isNaN(year) || year < 1000 || year > new Date().getFullYear()) {
+        throw new Error("Invalid year");
+    }
+    const copies = parseInt(totalCopies, 10);
+    if (isNaN(copies) || copies < 1) {
+        throw new Error("Invalid number of copies");
+    }
+    if (findBookByISBN(isbn.trim())) {
+        throw new Error(`A book with ISBN ${isbn.trim()} already exists`);
+    }
+    const newBook = new Book(isbn.trim(), title.trim(), author.trim(), parseInt(year, 10), copies);
+    if (category && typeof category === "string" && category.trim() !== "") {
+        newBook.category = category.trim();
+    }
+    books.push(newBook);
+    registerBookISBN(newBook);
+    LibraryStats.updateStats();
+    return newBook;
+}
+
+function setBooks(newBooks) {
+    books.length = 0;
+    books.push(...newBooks);
+    isbnLookup.clear();
+    for (const book of books) {
+        registerBookISBN(book);
+    }
+}
+
+function setMembers(newMembers) {
+    members.length = 0;
+    members.push(...newMembers);
+}
+
+module.exports = {
+    Book,
+    DigitalBook,
+    Member,
+    PremiumMember,
+    books,
+    members,
+    LATE_FEE_PER_DAY,
+    MAX_BOOKS_PER_MEMBER,
+    findOverdueBooks,
+    processReturnQueue,
+    searchBooksByCategory,
+    getBooksByAuthor,
+    calculateTotalLateFees,
+    combineBookCollections,
+    addMultipleBooks,
+    updateMemberInfo,
+    borrowBook,
+    findMemberById,
+    findBookByISBN,
+    LibraryStats,
+    formatBookInfo,
+    calculateFineAmount,
+    isbnLookup,
+    registerBookISBN,
+    findBookByISBNFast,
+    getBookTitles,
+    setBooks,
+    setMembers,
+    addBook
+};

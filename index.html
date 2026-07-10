@@ -46,6 +46,11 @@
                     <button type="submit">Borrow Book</button>
                 </form>
             </section>
+
+            <section id="add-book-section">
+                <h2>Add New Book</h2>
+                <!-- Add Book form injected by createBookForm() in ui.js -->
+            </section>
             
             <section id="member-section" style="display: none;">
                 <h2>Member Management</h2>
@@ -70,16 +75,14 @@
                     </div>
                     <div class="stat-card">
                         <h3>Books Borrowed</h3>
-                        <p class="books-borrowed">0</p>
+                        <p class="total-borrowings books-borrowed">0</p>
                     </div>
                 </div>
             </section>
         </main>
     </div>
     
-    <!-- Scripts in wrong order -->
-    <script src="ui.js"></script>
-    <script src="library.js"></script>
-    <!-- Missing: modules setup -->
+    <!-- ES6 Module Entry Point -->
+    <script type="module" src="ui.js"></script>
 </body>
 </html>
