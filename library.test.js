@@ -525,4 +525,81 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(members[members.length - 1].name).toBe('Charlie DOM');
         expect(members[members.length - 1].membershipType).toBe('premium');
     });
+
+    test('createBookForm renders form with all required fields', () => {
+        document.body.innerHTML += `<div id="add-book-section"></div>`;
+        const ui = require('./ui');
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        ui.createBookForm();
+
+        const form = document.getElementById('add-book-form');
+        expect(form).not.toBeNull();
+        expect(document.getElementById('new-isbn')).not.toBeNull();
+        expect(document.getElementById('new-title')).not.toBeNull();
+        expect(document.getElementById('new-author')).not.toBeNull();
+    });
+
+    test('tab navigation shows and hides correct sections on click', () => {
+        document.body.innerHTML += `
+            <button id="catalogue-tab">Catalogue</button>
+            <button id="members-tab">Members</button>
+            <button id="statistics-tab">Statistics</button>
+            <div id="catalogue-section"></div>
+            <div id="borrow-section"></div>
+            <div id="add-book-section"></div>
+            <div id="member-section"></div>
+            <div id="statistics-section"></div>
+        `;
+        require('./ui');
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        document.getElementById('members-tab').click();
+        expect(document.getElementById('member-section').style.display).toBe('block');
+
+        document.getElementById('catalogue-tab').click();
+        expect(document.getElementById('catalogue-section').style.display).toBe('block');
+    });
+
+    test('handleAddBookSubmit adds a book via the add book form', () => {
+        document.body.innerHTML += `<div id="add-book-section"></div>`;
+        const ui = require('./ui');
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        ui.createBookForm();
+
+        const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
+
+        document.getElementById('new-isbn').value = '978-NEW-1';
+        document.getElementById('new-title').value = 'New Book';
+        document.getElementById('new-author').value = 'New Author';
+        document.getElementById('new-year').value = '2023';
+        document.getElementById('new-copies').value = '3';
+
+        document.getElementById('add-book-form').dispatchEvent(new Event('submit', { bubbles: true }));
+
+        expect(alertSpy).toHaveBeenCalledWith(expect.stringContaining('New Book'));
+        expect(findBookByISBN('978-NEW-1')).toBeDefined();
+        alertSpy.mockRestore();
+    });
+
+    test('updateStatisticsDisplay updates DOM elements with current counts', () => {
+        setBooks([
+            new Book('978-1', 'Test Book', 'Author', 2020, 3),
+            new Book('978-2', 'Test Book 2', 'Author', 2021, 2)
+        ]);
+        setMembers([
+            new Member('M1', 'Alice', 'alice@test.com', 'standard')
+        ]);
+        saveToLocalStorage();
+
+        require('./ui');
+        document.dispatchEvent(new Event('DOMContentLoaded'));
+
+        const totalBooksEl = document.querySelector('.total-books');
+        const totalMembersEl = document.querySelector('.total-members');
+
+        expect(totalBooksEl.textContent).toBe('2');
+        expect(totalMembersEl.textContent).toBe('1');
+    });
 });
