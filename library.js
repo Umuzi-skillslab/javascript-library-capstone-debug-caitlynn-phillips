@@ -379,6 +379,40 @@ function setMembers(newMembers) {
     members.push(...newMembers);
 }
 
+function loadSampleData() {
+    if (books.length === 0) {
+        const sampleBooks = [
+            new Book('978-0-061-96436-9', 'To Kill a Mockingbird', 'Harper Lee', 1960, 3),
+            new Book('978-0-743-27356-5', 'The Great Gatsby', 'F. Scott Fitzgerald', 1925, 2),
+            new Book('978-0-385-33348-1', 'Clean Code', 'Robert Martin', 2008, 4),
+            new Book('978-1-491-95038-9', "You Don't Know JS", 'Kyle Simpson', 2015, 3),
+            new Book('978-0-201-63361-0', 'The Pragmatic Programmer', 'David Thomas', 1999, 2),
+            new Book('978-0-547-92822-7', 'The Hobbit', 'J.R.R. Tolkien', 1937, 4),
+            new Book('978-0-06-112008-4', 'To Kill a Mockingbird', 'Harper Lee', 1960, 2),
+            new Book('978-0-7432-7356-5', 'The Da Vinci Code', 'Dan Brown', 2003, 3),
+            new Book('978-0-14-028329-7', 'The Name of the Rose', 'Umberto Eco', 1980, 2),
+            new Book('978-0-7432-1733-8', 'Sapiens', 'Yuval Noah Harari', 2011, 4),
+            new Book('978-0-14-303943-3', 'A Brief History of Time', 'Stephen Hawking', 1988, 3),
+            new Book('978-0-618-57494-1', 'The Lord of the Rings', 'J.R.R. Tolkien', 1954, 5)
+        ];
+
+        sampleBooks[0].category = 'fiction';
+        sampleBooks[1].category = 'fiction';
+        sampleBooks[2].category = 'reference';
+        sampleBooks[3].category = 'non-fiction';
+        sampleBooks[4].category = 'reference';
+        sampleBooks[5].category = 'fantasy';
+        sampleBooks[6].category = 'fiction';
+        sampleBooks[7].category = 'mystery';
+        sampleBooks[8].category = 'mystery';
+        sampleBooks[9].category = 'history';
+        sampleBooks[10].category = 'history';
+        sampleBooks[11].category = 'fantasy';
+
+        sampleBooks.forEach(book => books.push(book));
+    }
+}
+
 export {
     Book,
     DigitalBook,
@@ -408,5 +442,6 @@ export {
     getBookTitles,
     setBooks,
     setMembers,
-    addBook
+    addBook,
+    loadSampleData
 };

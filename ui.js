@@ -6,7 +6,8 @@ import {
     LibraryStats,
     books,
     members,
-    addBook
+    addBook,
+    loadSampleData
 } from './library.js';
 
 import {
@@ -20,6 +21,7 @@ let filterDropdown;
 
 function loadCatalogue() {
     loadFromLocalStorage();
+    loadSampleData();
     renderBookCatalogue(books);
     updateStatisticsDisplay();
 }

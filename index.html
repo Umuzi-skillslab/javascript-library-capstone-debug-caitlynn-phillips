@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Library Management System</title>
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
     <div class="container">
         <header>
@@ -16,7 +18,7 @@
                 <button id="statistics-tab">Statistics</button>
             </nav>
         </header>
-        
+
         <main>
             <section id="catalogue-section">
                 <div class="controls">
@@ -26,18 +28,21 @@
                         <option value="fiction">Fiction</option>
                         <option value="non-fiction">Non-Fiction</option>
                         <option value="reference">Reference</option>
+                        <option value="fantasy">Fantasy</option>
+                        <option value="mystery">Mystery</option>
+                        <option value="history">History</option>
                     </select>
                 </div>
-                
+
                 <div id="catalogue-list" class="book-grid">
-                    <!-- Books rendered here -->
+
                 </div>
-                
+
                 <div id="book-details">
                     <!-- Selected book details -->
                 </div>
             </section>
-            
+
             <section id="borrow-section">
                 <h2>Borrow a Book</h2>
                 <form id="borrow-form">
@@ -49,19 +54,19 @@
 
             <section id="add-book-section">
                 <h2>Add New Book</h2>
-                <!-- Add Book form injected by createBookForm() in ui.js -->
+
             </section>
-            
+
             <section id="member-section" style="display: none;">
                 <h2>Member Management</h2>
                 <div id="member-form">
-                    <!-- Member form rendered here -->
+
                 </div>
                 <div id="member-list">
-                    <!-- Members list -->
+
                 </div>
             </section>
-            
+
             <section id="statistics-section" style="display: none;">
                 <h2>Library Statistics</h2>
                 <div class="stats-grid">
@@ -81,8 +86,8 @@
             </section>
         </main>
     </div>
-    
-    <!-- ES6 Module Entry Point -->
+
     <script type="module" src="ui.js"></script>
 </body>
+
 </html>
