@@ -1,22 +1,105 @@
+const {
+    Book,
+    Member,
+    borrowBook,
+    findBookByISBN,
+    LibraryStats,
+    books,
+    members,
+    addBook
+} = require('./library');
+
+const {
+    saveToLocalStorage,
+    loadFromLocalStorage
+} = require('./storage');
+
 let catalogueContainer;
 let searchInput;
 let filterDropdown;
 
+function loadCatalogue() {
+    loadFromLocalStorage();
+    renderBookCatalogue(books);
+    updateStatisticsDisplay();
+}
+
 function initializeUI() {
     catalogueContainer = document.querySelector("#catalogue-list");
-    searchInput = document.getElementById("search");
-    filterDropdown = document.querySelector("#filter-category");
+    searchInput        = document.getElementById("search");
+    filterDropdown     = document.querySelector("#filter-category");
 
     if (!catalogueContainer || !searchInput || !filterDropdown) {
         console.error("Required DOM elements not found");
         return;
     }
 
+    setupTabNavigation();
     setupEventListeners();
     loadCatalogue();
+    createBookForm();
+    createMemberForm();
 }
 
 document.addEventListener("DOMContentLoaded", initializeUI);
+
+function setupTabNavigation() {
+    const catalogueTab  = document.getElementById("catalogue-tab");
+    const membersTab    = document.getElementById("members-tab");
+    const statisticsTab = document.getElementById("statistics-tab");
+
+    const catalogueSection  = document.getElementById("catalogue-section");
+    const borrowSection     = document.getElementById("borrow-section");
+    const addBookSection    = document.getElementById("add-book-section");
+    const memberSection     = document.getElementById("member-section");
+    const statisticsSection = document.getElementById("statistics-section");
+
+    function clearTabs() {
+        [catalogueTab, membersTab, statisticsTab].forEach(tab => {
+            if (tab) tab.classList.remove("active");
+        });
+        [catalogueSection, borrowSection, addBookSection, memberSection, statisticsSection].forEach(sec => {
+            if (sec) sec.style.display = "none";
+        });
+    }
+
+    if (catalogueTab) {
+        catalogueTab.addEventListener("click", () => {
+            clearTabs();
+            catalogueTab.classList.add("active");
+            if (catalogueSection) catalogueSection.style.display = "block";
+            if (borrowSection)    borrowSection.style.display    = "block";
+            if (addBookSection)   addBookSection.style.display   = "block";
+        });
+        catalogueTab.classList.add("active");
+    }
+
+    if (membersTab) {
+        membersTab.addEventListener("click", () => {
+            clearTabs();
+            membersTab.classList.add("active");
+            if (memberSection) memberSection.style.display = "block";
+        });
+    }
+
+    if (statisticsTab) {
+        statisticsTab.addEventListener("click", () => {
+            clearTabs();
+            statisticsTab.classList.add("active");
+            if (statisticsSection) {
+                statisticsSection.style.display = "block";
+                LibraryStats.updateStats();
+                updateStatisticsDisplay();
+            }
+        });
+    }
+
+    if (catalogueSection)  catalogueSection.style.display  = "block";
+    if (borrowSection)     borrowSection.style.display     = "block";
+    if (addBookSection)    addBookSection.style.display    = "block";
+    if (memberSection)     memberSection.style.display     = "none";
+    if (statisticsSection) statisticsSection.style.display = "none";
+}
 
 function setupEventListeners() {
     searchInput.addEventListener("input", handleSearch);
@@ -27,13 +110,25 @@ function setupEventListeners() {
         borrowForm.addEventListener("submit", handleBorrowSubmit);
     }
 
-    // Event delegation handles clicks on dynamically rendered book cards
+    // Event delegation for dynamically rendered book cards
     if (catalogueContainer) {
         catalogueContainer.addEventListener("click", function(event) {
             const bookCard = event.target.closest(".book-card");
             if (bookCard) {
                 const isbn = bookCard.dataset.isbn;
                 displayBookDetails(isbn);
+            }
+        });
+    }
+
+    // Event delegation for dynamically rendered member cards
+    const memberList = document.getElementById("member-list");
+    if (memberList) {
+        memberList.addEventListener("click", function(event) {
+            const memberCard = event.target.closest(".member-card");
+            if (memberCard) {
+                const memberId = memberCard.dataset.memberId;
+                displayMemberDetails(memberId);
             }
         });
     }
@@ -44,9 +139,7 @@ function renderBookCatalogue(bookList) {
         return;
     }
 
-    // Clear container before re-rendering to avoid duplicates
     catalogueContainer.innerHTML = "";
-
     const fragment = document.createDocumentFragment();
 
     for (const book of bookList) {
@@ -71,7 +164,7 @@ function handleBorrowSubmit(event) {
     event.preventDefault();
 
     const memberIdInput = document.getElementById("member-id");
-    const isbnInput = document.getElementById("isbn");
+    const isbnInput     = document.getElementById("isbn");
 
     if (!memberIdInput || !isbnInput) {
         console.error("Form inputs not found");
@@ -79,7 +172,7 @@ function handleBorrowSubmit(event) {
     }
 
     const memberId = memberIdInput.value.trim();
-    const isbn = isbnInput.value.trim();
+    const isbn     = isbnInput.value.trim();
 
     if (memberId === "" || isbn === "") {
         alert("Please fill in all fields");
@@ -88,11 +181,10 @@ function handleBorrowSubmit(event) {
 
     try {
         const success = borrowBook(memberId, isbn);
-
         if (success) {
             alert(`Successfully borrowed book with ISBN: ${isbn}`);
             memberIdInput.value = "";
-            isbnInput.value = "";
+            isbnInput.value     = "";
             renderBookCatalogue(books);
         } else {
             alert("Unable to borrow book. Please check availability and borrowing limit.");
@@ -100,23 +192,6 @@ function handleBorrowSubmit(event) {
     } catch (error) {
         console.error(`handleBorrowSubmit error: ${error.message}`);
     }
-}
-
-function handleBookClick(event) {
-    const bookCard = event.target.closest(".book-card");
-    
-    if (!bookCard) {
-        return;
-    }
-
-    const isbn = bookCard.dataset.isbn;
-
-    if (!isbn) {
-        console.error("No ISBN found on book card");
-        return;
-    }
-
-    displayBookDetails(isbn);
 }
 
 function handleSearch(event) {
@@ -143,60 +218,6 @@ function handleFilterChange() {
     });
 
     renderBookCatalogue(filtered);
-}
-
-function exportLibraryData() {
-    try {
-        const data = { books, members };
-        return JSON.stringify(data, null, 2);
-    } catch (error) {
-        console.error(`exportLibraryData error: ${error.message}`);
-        return null;
-    }
-}
-
-function importLibraryData(jsonString) {
-    try {
-        if (typeof jsonString !== "string" || jsonString.trim() === "") {
-            return false;
-        }
-
-        const data = JSON.parse(jsonString);
-
-        if (!Array.isArray(data.books) || !Array.isArray(data.members)) {
-            return false;
-        }
-
-        books = data.books;
-        members = data.members;
-        return true;
-    } catch (error) {
-        console.error(`importLibraryData error: ${error.message}`);
-        return false;
-    }
-}
-
-function saveToLocalStorage() {
-    try {
-        localStorage.setItem("libraryBooks", JSON.stringify(books));
-        localStorage.setItem("libraryMembers", JSON.stringify(members));
-    } catch (error) {
-        console.error(`saveToLocalStorage error: ${error.message}`);
-    }
-}
-
-function loadFromLocalStorage() {
-    try {
-        const booksData = localStorage.getItem("libraryBooks");
-        const membersData = localStorage.getItem("libraryMembers");
-
-        books = booksData ? JSON.parse(booksData) : [];
-        members = membersData ? JSON.parse(membersData) : [];
-    } catch (error) {
-        console.error(`loadFromLocalStorage error: ${error.message}`);
-        books = [];
-        members = [];
-    }
 }
 
 function displayBookDetails(isbn) {
@@ -229,22 +250,23 @@ function displayBookDetails(isbn) {
     `;
 }
 
+function displayMemberDetails(memberId) {
+    if (typeof memberId === "undefined" || memberId === null) {
+        return;
+    }
+    const member = members.find(m => String(m.id) === String(memberId));
+    if (!member) return;
+    console.log(`Member: ${member.getMemberInfo()}`);
+}
+
 function updateStatisticsDisplay() {
-    const totalBooksEl = document.querySelector(".total-books");
-    const totalMembersEl = document.querySelector(".total-members");
+    const totalBooksEl      = document.querySelector(".total-books");
+    const totalMembersEl    = document.querySelector(".total-members");
     const totalBorrowingsEl = document.querySelector(".total-borrowings");
 
-    if (totalBooksEl) {
-        totalBooksEl.textContent = books.length;
-    }
-
-    if (totalMembersEl) {
-        totalMembersEl.textContent = members.length;
-    }
-
-    if (totalBorrowingsEl) {
-        totalBorrowingsEl.textContent = LibraryStats.totalBorrowings;
-    }
+    if (totalBooksEl)      totalBooksEl.textContent      = books.length;
+    if (totalMembersEl)    totalMembersEl.textContent    = members.length;
+    if (totalBorrowingsEl) totalBorrowingsEl.textContent = LibraryStats.totalBorrowings;
 }
 
 function createMemberForm() {
@@ -254,6 +276,9 @@ function createMemberForm() {
         console.error("Member form container not found");
         return;
     }
+
+    // Guard against duplicate form creation
+    if (formContainer.querySelector("#new-member-form")) return;
 
     const form = document.createElement("form");
     form.id = "new-member-form";
@@ -279,13 +304,14 @@ function createMemberForm() {
 
     form.addEventListener("submit", function(event) {
         event.preventDefault();
-        const name = document.getElementById("member-name").value.trim();
-        const email = document.getElementById("member-email").value.trim();
+        const name           = document.getElementById("member-name").value.trim();
+        const email          = document.getElementById("member-email").value.trim();
         const membershipType = document.getElementById("membership-type").value;
 
         if (name && email) {
             const newMember = new Member(members.length + 1, name, email, membershipType);
             members.push(newMember);
+            saveToLocalStorage();
             updateStatisticsDisplay();
             form.reset();
         }
@@ -293,3 +319,82 @@ function createMemberForm() {
 
     formContainer.appendChild(form);
 }
+
+function handleAddBookSubmit(event) {
+    event.preventDefault();
+
+    const isbn     = document.getElementById("new-isbn")?.value.trim();
+    const title    = document.getElementById("new-title")?.value.trim();
+    const author   = document.getElementById("new-author")?.value.trim();
+    const year     = document.getElementById("new-year")?.value.trim();
+    const copies   = document.getElementById("new-copies")?.value.trim();
+    const category = document.getElementById("new-category")?.value;
+
+    if (!isbn || !title || !author || !year || !copies) {
+        alert("Please fill in all required fields.");
+        return;
+    }
+
+    try {
+        const book = addBook(isbn, title, author, Number(year), Number(copies), category);
+        saveToLocalStorage();
+        renderBookCatalogue(books);
+        updateStatisticsDisplay();
+        event.target.reset();
+        alert(`"${book.title}" has been added to the catalogue.`);
+    } catch (error) {
+        alert(`Could not add book: ${error.message}`);
+    }
+}
+
+function createBookForm() {
+    const container = document.getElementById("add-book-section");
+    if (!container) return;
+
+    // Guard against duplicate form creation
+    if (container.querySelector("#add-book-form")) return;
+
+    const form = document.createElement("form");
+    form.id = "add-book-form";
+
+    form.innerHTML = `
+        <div class="form-group">
+            <label for="new-isbn">ISBN *</label>
+            <input type="text" id="new-isbn" placeholder="e.g. 978-0-061-96436-9" required>
+        </div>
+        <div class="form-group">
+            <label for="new-title">Title *</label>
+            <input type="text" id="new-title" placeholder="Book title" required>
+        </div>
+        <div class="form-group">
+            <label for="new-author">Author *</label>
+            <input type="text" id="new-author" placeholder="Author name" required>
+        </div>
+        <div class="form-group">
+            <label for="new-year">Year *</label>
+            <input type="number" id="new-year" placeholder="e.g. 2023" min="1000" max="${new Date().getFullYear()}" required>
+        </div>
+        <div class="form-group">
+            <label for="new-copies">Copies *</label>
+            <input type="number" id="new-copies" placeholder="Number of copies" min="1" required>
+        </div>
+        <div class="form-group">
+            <label for="new-category">Category</label>
+            <select id="new-category">
+                <option value="">-- Select Category --</option>
+                <option value="fiction">Fiction</option>
+                <option value="non-fiction">Non-Fiction</option>
+                <option value="reference">Reference</option>
+            </select>
+        </div>
+        <button type="submit">Add Book</button>
+    `;
+
+    form.addEventListener("submit", handleAddBookSubmit);
+    container.appendChild(form);
+}
+
+module.exports = {
+    createMemberForm,
+    createBookForm
+};
