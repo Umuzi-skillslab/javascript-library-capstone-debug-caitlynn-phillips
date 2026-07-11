@@ -1,5 +1,4 @@
 // Library Management System - Core Logic
-
 let books = [];
 let members = [];
 
@@ -380,7 +379,7 @@ function setMembers(newMembers) {
     members.push(...newMembers);
 }
 
-module.exports = {
+export {
     Book,
     DigitalBook,
     Member,

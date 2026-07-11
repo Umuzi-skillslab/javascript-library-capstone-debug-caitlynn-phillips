@@ -1,4 +1,4 @@
-const {
+import {
     Book,
     Member,
     borrowBook,
@@ -7,12 +7,12 @@ const {
     books,
     members,
     addBook
-} = require('./library');
+} from './library.js';
 
-const {
+import {
     saveToLocalStorage,
     loadFromLocalStorage
-} = require('./storage');
+} from './storage.js';
 
 let catalogueContainer;
 let searchInput;
@@ -394,7 +394,7 @@ function createBookForm() {
     container.appendChild(form);
 }
 
-module.exports = {
+export {
     createMemberForm,
     createBookForm
 };

@@ -1,4 +1,4 @@
-const {
+import {
     books,
     members,
     setBooks,
@@ -7,7 +7,7 @@ const {
     DigitalBook,
     Member,
     PremiumMember
-} = require('./library');
+} from './library.js';
 
 function exportLibraryData() {
     try {
@@ -137,7 +137,7 @@ function loadFromLocalStorage() {
     }
 }
 
-module.exports = {
+export {
     exportLibraryData,
     importLibraryData,
     saveToLocalStorage,

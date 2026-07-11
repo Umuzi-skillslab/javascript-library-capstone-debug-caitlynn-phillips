@@ -1,4 +1,6 @@
-const {
+import { jest } from '@jest/globals';
+
+import {
     Book,
     DigitalBook,
     Member,
@@ -25,14 +27,14 @@ const {
     findBookByISBNFast,
     setBooks,
     setMembers
-} = require('./library');
+} from './library.js';
 
-const {
+import {
     saveToLocalStorage,
     loadFromLocalStorage,
     exportLibraryData,
     importLibraryData
-} = require('./storage');
+} from './storage.js';
 
 describe('Book Class', () => {
     test('should create a book instance with correct properties', () => {
@@ -437,8 +439,8 @@ describe('DOM Rendering and Event Handlers', () => {
         saveToLocalStorage();
     });
 
-    test('renderBookCatalogue outputs book cards for each book', () => {
-        const ui = require('./ui');
+    test('renderBookCatalogue outputs book cards for each book', async () => {
+        const ui = await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const catalogue = document.getElementById('catalogue-list');
@@ -447,8 +449,8 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(catalogue.innerHTML).toContain('JS DOM');
     });
 
-    test('search input filters book cards by title or author', () => {
-        require('./ui');
+    test('search input filters book cards by title or author', async () => {
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const search = document.getElementById('search');
@@ -461,8 +463,8 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(catalogue.innerHTML).not.toContain('JS DOM');
     });
 
-    test('filter dropdown filters catalogue by selected category', () => {
-        require('./ui');
+    test('filter dropdown filters catalogue by selected category', async () => {
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const filter = document.getElementById('filter-category');
@@ -475,8 +477,8 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(catalogue.innerHTML).not.toContain('JS DOM');
     });
 
-    test('clicking a book card displays its details', () => {
-        require('./ui');
+    test('clicking a book card displays its details', async () => {
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const catalogue = document.getElementById('catalogue-list');
@@ -488,8 +490,8 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(details.innerHTML).toContain('Designer');
     });
 
-    test('submitting borrow form calls borrowBook and shows success alert', () => {
-        require('./ui');
+    test('submitting borrow form calls borrowBook and shows success alert', async () => {
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const alertSpy = jest.spyOn(window, 'alert').mockImplementation(() => {});
@@ -505,8 +507,8 @@ describe('DOM Rendering and Event Handlers', () => {
         alertSpy.mockRestore();
     });
 
-    test('createMemberForm renders form and adds new member on submit', () => {
-        const ui = require('./ui');
+    test('createMemberForm renders form and adds new member on submit', async () => {
+        const ui = await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         ui.createMemberForm();
@@ -526,9 +528,9 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(members[members.length - 1].membershipType).toBe('premium');
     });
 
-    test('createBookForm renders form with all required fields', () => {
+    test('createBookForm renders form with all required fields', async () => {
         document.body.innerHTML += `<div id="add-book-section"></div>`;
-        const ui = require('./ui');
+        const ui = await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         ui.createBookForm();
@@ -540,7 +542,7 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(document.getElementById('new-author')).not.toBeNull();
     });
 
-    test('tab navigation shows and hides correct sections on click', () => {
+    test('tab navigation shows and hides correct sections on click', async () => {
         document.body.innerHTML += `
             <button id="catalogue-tab">Catalogue</button>
             <button id="members-tab">Members</button>
@@ -551,7 +553,7 @@ describe('DOM Rendering and Event Handlers', () => {
             <div id="member-section"></div>
             <div id="statistics-section"></div>
         `;
-        require('./ui');
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         document.getElementById('members-tab').click();
@@ -561,9 +563,9 @@ describe('DOM Rendering and Event Handlers', () => {
         expect(document.getElementById('catalogue-section').style.display).toBe('block');
     });
 
-    test('handleAddBookSubmit adds a book via the add book form', () => {
+    test('handleAddBookSubmit adds a book via the add book form', async () => {
         document.body.innerHTML += `<div id="add-book-section"></div>`;
-        const ui = require('./ui');
+        const ui = await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         ui.createBookForm();
@@ -583,7 +585,7 @@ describe('DOM Rendering and Event Handlers', () => {
         alertSpy.mockRestore();
     });
 
-    test('updateStatisticsDisplay updates DOM elements with current counts', () => {
+    test('updateStatisticsDisplay updates DOM elements with current counts', async () => {
         setBooks([
             new Book('978-1', 'Test Book', 'Author', 2020, 3),
             new Book('978-2', 'Test Book 2', 'Author', 2021, 2)
@@ -593,7 +595,7 @@ describe('DOM Rendering and Event Handlers', () => {
         ]);
         saveToLocalStorage();
 
-        require('./ui');
+        await import('./ui.js');
         document.dispatchEvent(new Event('DOMContentLoaded'));
 
         const totalBooksEl = document.querySelector('.total-books');
