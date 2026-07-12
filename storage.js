@@ -9,6 +9,7 @@ import {
     PremiumMember
 } from './library.js';
 
+// Serializes library data to JSON string for export
 function exportLibraryData() {
     try {
         const data = { books, members };
@@ -82,6 +83,7 @@ function saveToLocalStorage() {
     }
 }
 
+// Reconstructs class instances after JSON parsing to restore methods
 function loadFromLocalStorage() {
     try {
         const booksData = localStorage.getItem("libraryBooks");

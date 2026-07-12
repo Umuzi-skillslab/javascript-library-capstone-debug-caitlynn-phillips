@@ -136,6 +136,7 @@ function processReturnQueue(queue) {
     }
 }
 
+// Recursive function with base case to prevent stack overflow
 function searchBooksByCategory(bookList, category, index = 0) {
     if (!Array.isArray(bookList) || typeof category !== "string") {
         return [];
@@ -154,6 +155,7 @@ function searchBooksByCategory(bookList, category, index = 0) {
     return searchBooksByCategory(bookList, category, index + 1);
 }
 
+// Uses Array.filter to find all books by a specific author
 function getBooksByAuthor(authorName) {
     if (typeof authorName !== "string" || authorName.trim() === "") {
         return [];
@@ -163,6 +165,7 @@ function getBooksByAuthor(authorName) {
     });
 }
 
+// Uses Array.reduce to sum late fees across all overdue books
 function calculateTotalLateFees(memberRecord) {
     if (typeof memberRecord !== "object" || memberRecord === null) {
         return 0;
@@ -175,6 +178,7 @@ function calculateTotalLateFees(memberRecord) {
     }, 0);
 }
 
+// Uses spread operator to merge three collections into one array
 function combineBookCollections(fiction, nonFiction, reference) {
     if (!Array.isArray(fiction) || !Array.isArray(nonFiction) || !Array.isArray(reference)) {
         return [];
@@ -182,6 +186,7 @@ function combineBookCollections(fiction, nonFiction, reference) {
     return [...fiction, ...nonFiction, ...reference];
 }
 
+// Uses rest parameters to accept any number of Book instances
 function addMultipleBooks(...newBooks) {
     if (newBooks.length === 0) {
         return;
@@ -193,6 +198,7 @@ function addMultipleBooks(...newBooks) {
     }
 }
 
+// Uses object destructuring to apply partial updates to a member
 function updateMemberInfo(member, updates) {
     if (typeof member !== "object" || member === null) {
         return null;
@@ -316,6 +322,7 @@ function calculateFineAmount(daysLate) {
     return parseFloat(fine.toFixed(2));
 }
 
+// Map provides O(1) average-case lookup by ISBN
 const isbnLookup = new Map();
 
 function registerBookISBN(book) {
@@ -379,6 +386,7 @@ function setMembers(newMembers) {
     members.push(...newMembers);
 }
 
+// Loads 12 sample books on first visit when localStorage is empty
 function loadSampleData() {
     if (books.length === 0) {
         const sampleBooks = [
