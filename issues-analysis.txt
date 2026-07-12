@@ -1,0 +1,137 @@
+LIBRARY MANAGEMENT SYSTEM
+Issues Analysis Document
+========================
+
+OVERVIEW
+--------
+The starter codebase was approximately 55% complete with 40+ identified errors
+across three files (library.js, ui.js and library.test.js). Errors are 
+categorized below by severity and JavaScript concept.
+
+
+CRITICAL ERRORS (breaks functionality)
+---------------------------------------
+These errors prevent the application from running.
+
+Variables & Scoping:
+1.  [CRITICAL] books undeclared - missing let declaration (library.js line 4)
+2.  [CRITICAL] MAX_BOOKS_PER_MEMBER undeclared - missing const declaration (library.js line 7)
+
+OOP & Classes:
+3.  [CRITICAL] DigitalBook missing super() call - crashes on instantiation (library.js line 33)
+4.  [CRITICAL] Book missing availableCopies and totalCopies - checkout system broken (library.js line 16)
+
+Operators:
+5.  [CRITICAL] Member.canBorrow() uses = instead of === - always returns false (library.js line 61)
+6.  [CRITICAL] findMemberById() uses = instead of === - always matches first member (library.js line 202)
+7.  [CRITICAL] handleFilterChange() uses = instead of === - filter never works (ui.js line 113)
+8.  [CRITICAL] searchBooksByCategory() uses = instead of === - wrong comparison (library.js line 116)
+
+Control Flow:
+9.  [CRITICAL] processReturnQueue() missing index++ - infinite loop freezes browser (library.js line 106)
+10. [CRITICAL] searchBooksByCategory() missing base case - causes stack overflow (library.js line 111)
+
+DOM:
+11. [CRITICAL] initializeUI() called before DOM loads - all selectors return null (ui.js line 226)
+12. [CRITICAL] filterDropdown selector missing # - element never found (ui.js line 12)
+13. [CRITICAL] handleBorrowSubmit() missing event.preventDefault() - page reloads on submit (ui.js line 56)
+
+JSON & Storage:
+14. [CRITICAL] saveToLocalStorage() missing JSON.stringify - stores [object Object] (ui.js line 151)
+15. [CRITICAL] loadFromLocalStorage() missing JSON.parse - assigns raw strings (ui.js line 157)
+
+
+MAJOR ERRORS (incorrect behaviour)
+------------------------------------
+These errors cause the application to behave incorrectly.
+
+Variables:
+16. [MAJOR] All var declarations - wrong scoping throughout both files
+17. [MAJOR] members declared with var instead of let (library.js line 5)
+
+OOP & Classes:
+18. [MAJOR] Member missing joinDate property (library.js line 53)
+19. [MAJOR] PremiumMember missing canBorrow() override - same limit as standard members (library.js line 75)
+20. [MAJOR] Member missing getMembershipDuration() and getMemberInfo() methods
+21. [MAJOR] LibraryStats missing three required methods
+
+Functions:
+22. [MAJOR] getBooksByAuthor() uses == instead of === (library.js line 129)
+23. [MAJOR] borrowBook() missing null checks - crashes if member or book not found
+24. [MAJOR] calculateFineAmount() missing toFixed(2) - incorrect currency formatting
+25. [MAJOR] exportLibraryData() returns raw object instead of JSON string (ui.js line 131)
+26. [MAJOR] importLibraryData() missing try/catch - crashes on invalid JSON (ui.js line 140)
+
+DOM:
+27. [MAJOR] handleSearch() case-sensitive - misses valid results
+28. [MAJOR] emailInput.type set to "text" instead of "email"
+29. [MAJOR] renderBookCatalogue() missing container clear - duplicates on re-render
+
+Testing:
+30. [MAJOR] findBookByISBN test has no beforeEach - books array always empty
+31. [MAJOR] calculateFineAmount test missing correct calculation assertion
+32. [MAJOR] Member canBorrow test uses wrong assertion type
+33. [MAJOR] All describe blocks empty - no actual test implementations
+
+
+MINOR ERRORS (missing features/optimization)
+---------------------------------------------
+These errors represent missing modern JavaScript features and optimizations.
+
+Modern JavaScript:
+34. [MINOR] All string concatenation - should use template literals throughout
+35. [MINOR] combineBookCollections() using three loops instead of spread operator
+36. [MINOR] addMultipleBooks() using fixed parameters instead of rest parameters
+37. [MINOR] updateMemberInfo() not using object destructuring
+
+Error Handling:
+38. [MINOR] No try/catch blocks anywhere in original code
+39. [MINOR] No input validation or null checks on any functions
+
+Testing:
+40. [MINOR] No tests for DigitalBook class
+41. [MINOR] No tests for PremiumMember class
+42. [MINOR] No tests for array methods (filter, map, reduce)
+43. [MINOR] No tests for error handling or edge cases
+44. [MINOR] No tests for JSON operations
+45. [MINOR] No tests for localStorage
+46. [MINOR] No tests for recursive functions
+47. [MINOR] No DOM tests with jsdom setup
+48. [MINOR] No beforeEach/afterEach hooks for test data setup
+49. [MINOR] No tests for spread operator or rest parameters
+50. [MINOR] No tests for destructuring
+
+
+MISSING FEATURES
+-----------------
+- Book.isAvailable() method
+- Book.getInfo() method using template literals
+- DigitalBook.getInfo() override
+- Member.getMembershipDuration() method
+- Member.getMemberInfo() using destructuring
+- PremiumMember.canBorrow() override allowing 10 books
+- LibraryStats.getAverageCheckouts() using Math object
+- LibraryStats.getBorrowingSummary() using for-of loop
+- LibraryStats.getStats() using destructuring
+- Event delegation for dynamic book cards
+- Search event listener
+- Module exports
+- 15+ Jest tests with full coverage
+- beforeEach hooks for test data initialization
+- Edge case and error handling tests
+
+
+FIX STRATEGY
+-------------
+Fixes were applied in the following systematic order:
+
+1. Variable declarations - establish correct scoping foundation
+2. Class inheritance - fix OOP structure before testing any functionality
+3. Comparison operators - fix all = to === errors
+4. Control flow - fix infinite loop and recursive stack overflow
+5. Functions - replace loops with array methods, add validation
+6. ES6 modernisation - template literals, destructuring, spread, rest
+7. DOM fixes - selectors, event listeners, event delegation
+8. JSON & localStorage - stringify, parse, try/catch
+9. Error handling - try/catch and null checks throughout
+10. Test suite - write 15+ comprehensive tests with edge cases
