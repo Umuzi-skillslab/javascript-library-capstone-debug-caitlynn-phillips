@@ -141,7 +141,6 @@ function searchBooksByCategory(bookList, category, index = 0) {
         return [];
     }
 
-    // Base case
     if (index >= bookList.length) {
         return [];
     }
@@ -159,7 +158,7 @@ function getBooksByAuthor(authorName) {
     if (typeof authorName !== "string" || authorName.trim() === "") {
         return [];
     }
-    return books.filter(function(book) {
+    return books.filter(function (book) {
         return book.author === authorName;
     });
 }
@@ -171,7 +170,7 @@ function calculateTotalLateFees(memberRecord) {
     if (!Array.isArray(memberRecord.overdueBooks) || memberRecord.overdueBooks.length === 0) {
         return 0;
     }
-    return memberRecord.overdueBooks.reduce(function(total, book) {
+    return memberRecord.overdueBooks.reduce(function (total, book) {
         return total + book.daysLate * LATE_FEE_PER_DAY;
     }, 0);
 }
@@ -229,6 +228,7 @@ function borrowBook(memberId, isbn) {
         if (member.canBorrow() && book.isAvailable()) {
             book.checkOut(memberId);
             member.borrowedBooks.push(isbn);
+            LibraryStats.totalBorrowings++;
             return true;
         }
         return false;
@@ -242,8 +242,8 @@ function findMemberById(id) {
     if (typeof id === "undefined" || id === null) {
         return null;
     }
-    return members.find(function(member) {
-        return member.id === id;
+    return members.find(function (member) {
+        return String(member.id) === String(id);
     });
 }
 
@@ -251,7 +251,7 @@ function findBookByISBN(isbn) {
     if (typeof isbn === "undefined" || isbn === null) {
         return null;
     }
-    return books.find(function(book) {
+    return books.find(function (book) {
         return book.isbn === isbn;
     });
 }
@@ -261,42 +261,42 @@ const LibraryStats = {
     totalMembers: 0,
     totalBorrowings: 0,
 
-    updateStats: function() {
+    updateStats: function () {
         this.totalBooks = books.length;
         this.totalMembers = members.length;
     },
 
-    getAverageCheckouts: function() {
+    getAverageCheckouts: function () {
         if (books.length === 0) {
             return 0;
         }
-        const total = books.reduce(function(sum, book) {
+        const total = books.reduce(function (sum, book) {
             return sum + book.checkedOut.length;
         }, 0);
         return Math.round(total / books.length);
     },
 
-    getBorrowingSummary: function() {
+    getBorrowingSummary: function () {
         return books
             .filter(book => book.checkedOut.length > 0)
             .map(book => `${book.title}: ${book.checkedOut.length} checkouts`);
     },
 
-    getStats: function() {
+    getStats: function () {
         const { totalBooks, totalMembers, totalBorrowings } = this;
         return { totalBooks, totalMembers, totalBorrowings };
     },
 
-    getMostPopularBook: function() {
+    getMostPopularBook: function () {
         if (books.length === 0) {
             return null;
         }
-        return books.reduce(function(mostPopular, book) {
+        return books.reduce(function (mostPopular, book) {
             return book.checkedOut.length > mostPopular.checkedOut.length ? book : mostPopular;
         }, books[0]);
     },
 
-    hasAvailableBooks: function() {
+    hasAvailableBooks: function () {
         return books.some(book => book.isAvailable());
     }
 };
